@@ -24,6 +24,7 @@ convert = {
 
 # assuming SWDA corpus installed in path-to-project/swda
 # url of repo is https://github.com/cgpotts/swda
+# proprocessor script for this model is in https://github.com/miyamotost/swda
 corpus = CorpusReader('swda/swda')
 
 with open('dataset/swda_datset_training.txt', mode='a') as f1, open('dataset/swda_datset_test.txt', mode='a') as f2:

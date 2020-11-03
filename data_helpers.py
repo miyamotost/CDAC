@@ -14,6 +14,10 @@ from collections import Counter
 import collections, pickle
 
 
+# templarily escape "NameError: global name 'ent_dict' is not defined"
+ent_dict = {}
+
+
 ################################################################################################
 ################################################################################################
 def char2vec(text, sequence_max_length, char_dict):
@@ -174,11 +178,11 @@ def load_data_and_labels(train_file, test_file):
     ib_label = dict()
     ibl = -1
 
-    with open('/Users/aliahmadvand/Desktop/Dialogue_Act/Contextual_DA/swda-master/label_list.pickle', 'rb') as f:
+    with open('./auxiliary_files/label_list.pickle', 'rb') as f:
         class_lbl = pickle.load(f)
 
     class_lbl.remove('+')
-    with open('/Users/aliahmadvand/Desktop/Dialogue_Act/Contextual_DA/swda-master/pos_list.pickle', 'rb') as f:
+    with open('./auxiliary_files/pos_list.pickle', 'rb') as f:
         pos_lbl = pickle.load(f)
 
     pos_dict = {'CC': 1, 'CD': 2, 'DT': 3, 'EX': 4, 'FW': 5, 'IN': 6, 'JJ': 7, 'JJR': 8, 'JJS': 9, \
@@ -187,7 +191,7 @@ def load_data_and_labels(train_file, test_file):
                 'VBN': 30, 'VBP': 31, 'VBZ': 32, 'WDT': 33, 'WP': 34, 'WP$': 35, 'WRB': 36, ',': 37}
 
 
-    with open('/Users/aliahmadvand/Desktop/Dialogue_Act/Contextual_DA/swda-master/topic_list.pickle', 'rb') as f:
+    with open('./auxiliary_files/topic_list.pickle', 'rb') as f:
         topic_lbl = pickle.load(f)
 
     topic_dict = dict()
@@ -480,6 +484,7 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
     data_size = len(data)
     num_batches_per_epoch = int((len(data)-1)/batch_size) + 1
     for epoch in range(num_epochs):
+        print('epoch: {}, num_batches_per_epoch: {}'.format(epoch, num_batches_per_epoch))
         # Shuffle the data at each epoch
         if shuffle:
             shuffle_indices = np.random.permutation(np.arange(data_size))

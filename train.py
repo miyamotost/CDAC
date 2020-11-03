@@ -77,7 +77,8 @@ x_pos2_shuf = data_helpers.fit_transform_pos(x_pos2_shuf, vocab_processor)
 vocab_processor = np.zeros([len(x_text[0]), max_document_length])
 x_pos3_shuf = data_helpers.fit_transform_pos(x_pos3_shuf, vocab_processor)
 
-char_length = max([len(x) for x in x_text[0]])
+#char_length = max([len(x) for x in x_text[0]])
+char_length = 550
 print "char_length:  ", char_length
 
 offset = int(x_shuf.shape[0] * 0)
@@ -213,7 +214,9 @@ with tf.Graph().as_default():
         sess.run(tf.global_variables_initializer())
 
         count =0
-        if FLAGS.word2vec:
+        #test
+        #if FLAGS.word2vec:
+        if False:
             print "\n====>len Vocab after all these {}".format(len(vocab))
             initW = np.random.uniform(-0.25, 0.25, (len(vocab), FLAGS.embedding_dim))
 
@@ -317,7 +320,7 @@ with tf.Graph().as_default():
                 cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
             }
             step, summaries, loss, predictions, true_labels, accuracy = sess.run([global_step, dev_summary_op, cnn.loss, cnn.predictions, cnn.true_labels, cnn.accuracy], feed_dict)
-            compute_prf(predictions, true_labels, class_label)
+            # compute_prf(predictions, true_labels, class_label)
             # print confusion_matrix(true_labels, predictions)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, -acc {:g}".format(time_str, step, loss, accuracy))

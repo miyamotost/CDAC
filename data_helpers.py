@@ -414,6 +414,275 @@ def load_data_and_labels(train_file, test_file):
 
     return Data, char_Data, ib_Data, cl_Data, topic_Data, features_Data, speakerID_Data, hub_Data, np.array(label_pred), np.array(handcraft_train), vocab, w2v, ent_dict, train_dev_index-1, data_pred, class_label
 
+def load_data_and_labels_for_pred(test_file):
+
+    dialogue_dataset = []
+
+    dialogue_dataset_test = open(test_file).read().split('\n')
+    print len(dialogue_dataset_test)
+    dialogue_dataset.extend(dialogue_dataset_test)
+
+    #preparing data for training
+    num_classes = 42
+    state_size = 43
+    speakerID_size = 609
+
+    label_pred = []
+
+    st2_features = []
+    st1_features = []
+
+    ib2_features = []
+    ib1_features = []
+
+    speakerid3_features = []
+    speakerid2_features = []
+    speakerid1_features = []
+    speakerid_pred_features = []
+
+    cl2_features = []
+    cl1_features = []
+    cl0_features = []
+
+    data_pred = []
+    data_utt3 = []
+    data_utt2 = []
+    data_utt1 = []
+
+    data_features_pred = []
+    data_features_utt1 = []
+    data_features_utt2 = []
+    data_features_utt3 = []
+
+    data_ib1 = []
+    data_ib2 = []
+
+
+    data_char_pred = []
+    data_char1 = []
+    data_char2 = []
+
+    data_pos1 = []
+    data_pos2 = []
+    data_pos3 = []
+    data_pos_pred = []
+
+    data_hub1 = []
+    data_hub2 = []
+    data_hub_pred = []
+
+    data_topic1 = []
+    data_topic2 = []
+    data_topic3 = []
+    data_topic_pred = []
+
+    class_label = dict()
+    classl = -1
+
+    speakerID_label = dict()
+    spi = -1
+
+    ib_label = dict()
+    ibl = -1
+
+    with open('./auxiliary_files/label_list.pickle', 'rb') as f:
+        class_lbl = pickle.load(f)
+
+    class_lbl.remove('+')
+    with open('./auxiliary_files/pos_list.pickle', 'rb') as f:
+        pos_lbl = pickle.load(f)
+
+    pos_dict = {'CC': 1, 'CD': 2, 'DT': 3, 'EX': 4, 'FW': 5, 'IN': 6, 'JJ': 7, 'JJR': 8, 'JJS': 9, \
+                'LS': 10, 'MD': 11, 'NN': 12, 'NNS': 13, 'NNP': 14, 'NNPS': 15, 'PDT': 16, 'POS': 17, 'PRP': 18,
+                'PRP$': 19, 'RB': 20, 'RBR': 21, 'RBS': 22, 'RP': 23, 'SYM': 24, 'TO': 25, 'UH': 26, 'VB': 27, 'VBD': 28, 'VBG': 29, \
+                'VBN': 30, 'VBP': 31, 'VBZ': 32, 'WDT': 33, 'WP': 34, 'WP$': 35, 'WRB': 36, ',': 37}
+
+
+    with open('./auxiliary_files/topic_list.pickle', 'rb') as f:
+        topic_lbl = pickle.load(f)
+
+    topic_dict = dict()
+    for i, topic in enumerate(topic_lbl):
+        topic_dict[topic] = i + 1
+
+
+    cl_label = dict()
+    cll = -1
+    for i, label in enumerate(class_lbl):
+        cl_label[label] = i
+
+    vocabulary = set()
+    all_states = []
+    all_distinct_states = []
+
+    sample_count = 0
+    num_conversation = 0
+    for iter, sample1 in enumerate(dialogue_dataset):
+        num_conversation += 1
+
+        if len(sample1) > 0:
+
+            sample = json.loads(sample1)
+            pre_label = (sample['label'][-1])
+            label = pre_label
+
+
+            if len(label) > 0 :
+
+                    sample_count += 1
+                    all_distinct_states.append(sample['label'][-1])
+                    all_states.append(sample['label'][-1])
+                    all_states.append(sample['label'][2])
+                    all_states.append(sample['label'][1])
+                    all_states.append(sample['label'][0])
+
+                    utt_pred = clean_str(sample['utt'][-1].lower())
+                    data_pred.append(utt_pred)
+                    utt_1 = clean_str(sample['utt'][2].lower())
+                    data_utt1.append(utt_1)
+                    utt_2 = clean_str(sample['utt'][1].lower())
+                    data_utt2.append(utt_2)
+                    utt_3 = clean_str(sample['utt'][0].lower())
+                    data_utt3.append(utt_3)
+
+
+                    data_features_pred.append(extracting_structral_features(utt_pred, sample['utt'][-1].lower(), label))
+                    data_features_utt1.append(extracting_structral_features(utt_1, sample['utt'][2].lower(),label))
+                    data_features_utt2.append(extracting_structral_features(utt_2, sample['utt'][1].lower(), label))
+                    data_features_utt3.append(extracting_structral_features(utt_3, sample['utt'][0].lower(), label))
+
+
+                    vocabulary.update(utt_pred.lower().split())
+
+                    data_ib1.append((sample['label'][1]))
+                    data_ib2.append((sample['label'][0]))
+
+
+                    data_char_pred.append(load_char_text(utt_pred, 550))
+                    data_char1.append(load_char_text(utt_1, 550))
+                    data_char2.append(load_char_text(utt_2, 550))
+
+                    data_pos_pred.append(getting_extra_features(sample['pos'][-1], pos_dict))
+                    data_pos1.append(getting_extra_features(sample['pos'][1], pos_dict))
+                    data_pos2.append(getting_extra_features(sample['pos'][0], pos_dict))
+                    data_pos3.append(getting_extra_features(sample['pos'][0], pos_dict))
+
+                    data_topic_pred.append(getting_topic_features(sample['main_topics'][-1], topic_dict))
+                    data_topic1.append(getting_topic_features(sample['main_topics'][2], topic_dict))
+                    data_topic2.append(getting_topic_features(sample['main_topics'][1], topic_dict))
+                    data_topic3.append(getting_topic_features(sample['main_topics'][0], topic_dict))
+
+                    data_hub_pred.append(np.zeros(128))
+                    data_hub1.append(np.zeros(128))
+                    data_hub2.append(np.zeros(128))
+
+
+                    speakerid_pred = sample['speakerid'][-1]
+                    speakerid1 = sample['speakerid'][2]
+                    speakerid2 = sample['speakerid'][1]
+                    speakerid3 = sample['speakerid'][0]
+
+                    #######################################################
+                    one_hot = np.zeros(num_classes)
+                    if label not in class_label.keys():
+                        classl = classl + 1
+                        class_label[label] = classl
+
+                    one_hot[class_label[label]] = 1
+                    label_pred.append(one_hot)
+
+                    #######################################################
+                    one_hot = np.zeros(state_size)
+                    if data_ib1[-1] not in ib_label.keys():
+                        ibl = ibl + 1
+                        ib_label[data_ib1[-1]] = ibl
+                        # print ibl
+
+                    one_hot[ib_label[data_ib1[-1]]] = 1
+                    ib1_features.append(one_hot)
+
+                    #######################################################
+                    one_hot = np.zeros(state_size)
+                    if data_ib2[-1] not in ib_label.keys():
+                        ibl = ibl + 1
+                        ib_label[data_ib2[-1]] = ibl
+                        # print ibl
+
+                    one_hot[ib_label[data_ib2[-1]]] = 1
+                    ib2_features.append(one_hot)
+
+                    #######################################################
+                    one_hot = np.zeros(speakerID_size)
+                    if speakerid_pred not in speakerID_label.keys():
+                        spi = spi + 1
+                        speakerID_label[speakerid_pred] = spi
+                        # print spi
+
+                    one_hot[speakerID_label[speakerid_pred]] = 1
+                    speakerid_pred_features.append(one_hot)
+
+                    #######################################################
+                    one_hot = np.zeros(speakerID_size)
+                    if speakerid1 not in speakerID_label.keys():
+                        spi = spi + 1
+                        speakerID_label[speakerid1] = spi
+                        # print spi
+
+                    one_hot[speakerID_label[speakerid1]] = 1
+                    speakerid1_features.append(one_hot)
+
+                    #######################################################
+                    one_hot = np.zeros(speakerID_size)
+                    if speakerid2 not in speakerID_label.keys():
+                        spi = spi + 1
+                        speakerID_label[speakerid2] = spi
+                        # print spi
+
+                    one_hot[speakerID_label[speakerid2]] = 1
+                    speakerid2_features.append(one_hot)
+
+                #######################################################
+                    one_hot = np.zeros(speakerID_size)
+                    if speakerid3 not in speakerID_label.keys():
+                        spi = spi + 1
+                        speakerID_label[speakerid3] = spi
+                        # print spi
+
+                    one_hot[speakerID_label[speakerid3]] = 1
+                    speakerid3_features.append(one_hot)
+
+            #######################################################
+            else:
+                print "...."
+
+        else:
+            print "...."
+
+    print sample_count,  "num conversations: ", num_conversation
+    counter = collections.Counter(all_distinct_states)
+
+    print(counter.values())
+    print(counter.keys())
+
+    Data = [data_pred, data_utt1, data_utt2, data_utt3]
+    features_Data = [data_features_pred, data_features_utt1, data_features_utt2, data_features_utt3]
+    cl_Data = [data_pos_pred, data_pos1, data_pos2, data_pos3]
+    topic_Data = [data_topic_pred, data_topic1, data_topic2, data_topic3]
+    char_Data = [data_char_pred, data_char1, data_char2]
+    ib_Data = [ib1_features, ib2_features]
+    speakerID_Data = [speakerid_pred_features, speakerid1_features, speakerid2_features, speakerid3_features]
+    hub_Data = [data_hub_pred, data_hub1, data_hub2]
+
+    handcraft = []
+    for i, sample in enumerate(data_pred):
+        G = np.ones(1)
+
+        handcraft.append(G)
+
+    print "Data: ", np.array(Data).shape
+
+    return Data, char_Data, ib_Data, cl_Data, topic_Data, features_Data, speakerID_Data, hub_Data, np.array(label_pred), np.array(handcraft)
+
 ################################################################################################
 # Assign onehot vector for every word and entity in the dictionary
 def get_entity_vector(orig_txt, new_text, entities):

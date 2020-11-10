@@ -169,7 +169,7 @@ def load_data_and_labels(train_file, test_file):
     data_topic3 = []
     data_topic_pred = []
 
-    class_label = dict()
+    class_label = {u'Q': 2, u'I': 3, u'C': 1, u'D': 0}
     classl = -1
 
     speakerID_label = dict()
@@ -284,9 +284,6 @@ def load_data_and_labels(train_file, test_file):
 
                     #######################################################
                     one_hot = np.zeros(num_classes)
-                    if label not in class_label.keys():
-                        classl = classl + 1
-                        class_label[label] = classl
 
                     one_hot[class_label[label]] = 1
                     label_pred.append(one_hot)
@@ -376,16 +373,6 @@ def load_data_and_labels(train_file, test_file):
     speakerID_Data = [speakerid_pred_features, speakerid1_features, speakerid2_features, speakerid3_features]
     hub_Data = [data_hub_pred, data_hub1, data_hub2]
 
-
-    class_order = dict()
-    for label in class_label:
-        class_order[class_label[label]] = label
-
-    print class_order
-    file_classorder = open('./auxiliary_files/class_order.json', 'w')
-    json.dump(class_order, file_classorder)
-
-
     handcraft_train = []
     for i, sample in enumerate(data_pred):
         G = np.ones(1)
@@ -421,7 +408,7 @@ def load_data_and_labels_for_pred(test_file):
     dialogue_dataset.extend(dialogue_dataset_test)
 
     #preparing data for training
-    num_classes = 42
+    num_classes = 4
     state_size = 43
     speakerID_size = 3
 
@@ -474,7 +461,7 @@ def load_data_and_labels_for_pred(test_file):
     data_topic3 = []
     data_topic_pred = []
 
-    class_label = dict()
+    class_label = {u'Q': 2, u'I': 3, u'C': 1, u'D': 0}
     classl = -1
 
     speakerID_label = dict()
@@ -483,10 +470,8 @@ def load_data_and_labels_for_pred(test_file):
     ib_label = dict()
     ibl = -1
 
-    with open('./auxiliary_files/label_list.pickle', 'rb') as f:
-        class_lbl = pickle.load(f)
+    class_lbl = {'I','Q','D','C'}
 
-    class_lbl.remove('+')
     with open('./auxiliary_files/pos_list.pickle', 'rb') as f:
         pos_lbl = pickle.load(f)
 
@@ -582,9 +567,6 @@ def load_data_and_labels_for_pred(test_file):
 
                     #######################################################
                     one_hot = np.zeros(num_classes)
-                    if label not in class_label.keys():
-                        classl = classl + 1
-                        class_label[label] = classl
 
                     one_hot[class_label[label]] = 1
                     label_pred.append(one_hot)

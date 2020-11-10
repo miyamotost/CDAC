@@ -4,10 +4,10 @@ import numpy as np
 
 class ContextualDAC(object):
     """
-       Contextual Dialogue Act Classification 
+       Contextual Dialogue Act Classification
     """
     def __init__(self, sequence_length, num_classes, vocab_size, vocab_entity_size, vocab_pos_size, sequence_char_length, num_quantized_chars,
-    embedding_size, embedding_entity_size, embedding_char_size, embedding_pos_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
+    embedding_size, embedding_entity_size, embedding_char_size, embedding_pos_size, filter_sizes, num_filters, l2_reg_lambda=0.0, speakerid_size=609):
 
             # Placeholders for input, output and dropout
             # self.input_x_entity = tf.placeholder(tf.int32, [None, sequence_length], name="input_entityvector")
@@ -31,10 +31,10 @@ class ContextualDAC(object):
             self.input_pos3 = tf.placeholder(tf.int32, [None, sequence_length], name="input_pos3")
 
             # class yesno intent input
-            self.input_spId0 = tf.placeholder(tf.float32, [None, 609], name="input_spi0")
-            self.input_spId1 = tf.placeholder(tf.float32, [None, 609], name="input_spi1")
-            self.input_spId2 = tf.placeholder(tf.float32, [None, 609], name="input_spi2")
-            self.input_spId3 = tf.placeholder(tf.float32, [None, 609], name="input_spi3")
+            self.input_spId0 = tf.placeholder(tf.float32, [None, speakerid_size], name="input_spi0")
+            self.input_spId1 = tf.placeholder(tf.float32, [None, speakerid_size], name="input_spi1")
+            self.input_spId2 = tf.placeholder(tf.float32, [None, speakerid_size], name="input_spi2")
+            self.input_spId3 = tf.placeholder(tf.float32, [None, speakerid_size], name="input_spi3")
 
             # class yesno intent input
             self.input_hub0 = tf.placeholder(tf.float32, [None, 128], name="input_hub0")
